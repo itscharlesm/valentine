@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Valentines</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Poppins:wght@300;400;600&display=swap"
+        rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="css/images/logo.png">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #ffc0cb 0%, #ffb6c1 50%, #ff69b4 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Screen Management */
+        .screen {
+            display: none;
+            width: 100%;
+            height: 100vh;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        .content {
+            text-align: center;
+            padding: 20px;
+            max-width: 800px;
+            width: 90%;
+        }
+
+        /* Initial Screen Styles */
+        #initialScreen h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3.5rem;
+            color: #fff;
+            margin-bottom: 40px;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .proceed-btn {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            padding: 20px 60px;
+            background: linear-gradient(45deg, #ff1493 0%, #ff69b4 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            font-weight: 600;
+        }
+
+        .proceed-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Question Screen Styles */
+        .flowers-gif {
+            width: 300px;
+            max-width: 80%;
+            margin-bottom: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .question {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2rem;
+            color: #fff;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .main-question {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3rem;
+            color: #fff;
+            margin-bottom: 40px;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+            font-weight: 700;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            position: relative;
+            min-height: 80px;
+        }
+
+        .yes-btn,
+        .no-btn {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.3rem;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .yes-btn {
+            background: linear-gradient(45deg, #ff1493 0%, #ff69b4 100%);
+            color: white;
+            z-index: 10;
+            transform-origin: center;
+        }
+
+        .yes-btn:hover {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .no-btn {
+            background: #fff;
+            color: #ff1493;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .no-btn:hover {
+            background: #f0f0f0;
+        }
+
+        /* Success Screen Styles */
+        .celebration-gif {
+            width: 400px;
+            max-width: 90%;
+            margin-bottom: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .success-message {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3.5rem;
+            color: #fff;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+            font-weight: 700;
+        }
+
+        .hearts {
+            display: inline-block;
+            animation: heartBeat 1.5s infinite;
+        }
+
+        /* Falling Hearts Background */
+        .hearts-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .falling-heart {
+            position: absolute;
+            font-size: 20px;
+            animation: fall linear infinite;
+            opacity: 0.7;
+        }
+
+        /* Animations */
+        @keyframes fade-in {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fade-in 1s ease-out;
+        }
+
+        .fade-in-delay {
+            animation: fade-in 1s ease-out 0.3s both;
+        }
+
+        .fade-in-delay-2 {
+            animation: fade-in 1s ease-out 0.6s both;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .bounce {
+            animation: bounce 1s ease-in-out infinite;
+        }
+
+        @keyframes slide-down {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-down {
+            animation: slide-down 1s ease-out;
+        }
+
+        @keyframes zoom-in {
+            from {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .zoom-in {
+            animation: zoom-in 0.8s ease-out;
+        }
+
+        @keyframes heartBeat {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            25% {
+                transform: scale(1.2);
+            }
+
+            50% {
+                transform: scale(1);
+            }
+
+            75% {
+                transform: scale(1.2);
+            }
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+
+        /* Yes Button Growing Animation */
+        .yes-btn.grow {
+            animation: growButton 0.5s ease-out forwards;
+        }
+
+        @keyframes growButton {
+            to {
+                transform: scale(var(--scale-factor));
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            #initialScreen h1 {
+                font-size: 2.5rem;
+            }
+
+            .main-question {
+                font-size: 2rem;
+            }
+
+            .question {
+                font-size: 1.5rem;
+            }
+
+            .success-message {
+                font-size: 2.5rem;
+            }
+
+            .proceed-btn {
+                font-size: 1.2rem;
+                padding: 15px 40px;
+            }
+
+            .yes-btn,
+            .no-btn {
+                font-size: 1.1rem;
+                padding: 12px 30px;
+            }
+
+            .flowers-gif {
+                width: 250px;
+            }
+
+            .celebration-gif {
+                width: 300px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #initialScreen h1 {
+                font-size: 2rem;
+            }
+
+            .main-question {
+                font-size: 1.5rem;
+            }
+
+            .question {
+                font-size: 1.2rem;
+            }
+
+            .success-message {
+                font-size: 1.8rem;
+            }
+
+            .flowers-gif {
+                width: 200px;
+            }
+
+            .celebration-gif {
+                width: 250px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Developed by GrabCharles -->
+    <!-- Initial Screen -->
+    <div id="initialScreen" class="screen active">
+        <div class="content">
+            <h1 class="fade-in">I have something to say...</h1>
+            <button id="proceedBtn" class="proceed-btn pulse">Proceed</button>
+        </div>
+    </div>
+
+    <!-- Question Screen -->
+    <div id="questionScreen" class="screen">
+        <div class="content">
+            <img src="css/images/flowers.gif" alt="Flowers" class="flowers-gif slide-down">
+            <h2 class="question fade-in-delay">Dear Miss Alliah Bianca Pelegrino, RN</h2>
+            <h1 class="main-question fade-in-delay-2">Will you be my Valentine?</h1>
+            <div class="button-container">
+                <button id="yesBtn" class="yes-btn bounce">Yes! 💕</button>
+                <button id="noBtn" class="no-btn">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Screen -->
+    <div id="successScreen" class="screen">
+        <div class="content">
+            <img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExMmo3c3l5ODh3ZGN6NHhhaDE2Mjg1ZjkwOXczdDFxbWM3dTBtaW9zaiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/9XY4f3FgFTT4QlaYqa/giphy.gif"
+                alt="Celebration" class="celebration-gif zoom-in">
+            <h1 class="success-message fade-in">I knew you would say yes! <br>I LOVE YOU MY PRETTY BABYYY!<br><span
+                    class="hearts">💗💗💗</span></h1>
+        </div>
+    </div>
+
+    <!-- Audio -->
+    <audio id="mainFunctionSound" src="css/sounds/love_me_not.mp3" preload="auto"></audio>
+
+    <!-- Falling Hearts Background -->
+    <div class="hearts-background" id="heartsBackground"></div>
+
+    <!-- JS -->
+    <script>
+        // Get elements
+        const initialScreen = document.getElementById('initialScreen');
+        const questionScreen = document.getElementById('questionScreen');
+        const successScreen = document.getElementById('successScreen');
+        const proceedBtn = document.getElementById('proceedBtn');
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const audio = document.getElementById('mainFunctionSound');
+        const heartsBackground = document.getElementById('heartsBackground');
+
+        // Variables
+        let noClickCount = 0;
+        let scaleFactor = 1;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Create falling hearts
+            createFallingHearts();
+        });
+
+        // Proceed button click
+        proceedBtn.addEventListener('click', () => {
+            // Play audio
+            audio.play().catch(error => {
+                console.log('Audio play failed:', error);
+            });
+
+            // Transition to question screen
+            initialScreen.classList.remove('active');
+            setTimeout(() => {
+                questionScreen.classList.add('active');
+            }, 300);
+        });
+
+        // Yes button click
+        yesBtn.addEventListener('click', () => {
+            // Transition to success screen
+            questionScreen.classList.remove('active');
+            setTimeout(() => {
+                successScreen.classList.add('active');
+                // Create celebration effect
+                createCelebrationHearts();
+            }, 300);
+        });
+
+        // No button click
+        noBtn.addEventListener('click', () => {
+            noClickCount++;
+
+            // Increase yes button size significantly each time
+            scaleFactor += 0.5;
+            yesBtn.style.transform = `scale(${scaleFactor})`;
+            yesBtn.style.transition = 'transform 0.3s ease';
+
+            // Move no button randomly
+            moveNoButton();
+
+            // Add shake animation to no button
+            noBtn.style.animation = 'none';
+            setTimeout(() => {
+                noBtn.style.animation = 'shake 0.5s';
+            }, 10);
+
+            // After 5 clicks, make yes button cover most of the screen
+            if (noClickCount >= 5) {
+                yesBtn.style.position = 'fixed';
+                yesBtn.style.top = '50%';
+                yesBtn.style.left = '50%';
+                yesBtn.style.transform = `translate(-50%, -50%) scale(${scaleFactor * 3})`;
+                yesBtn.style.zIndex = '1000';
+                noBtn.style.display = 'none';
+            }
+        });
+
+        // Move no button randomly
+        function moveNoButton() {
+            const container = document.querySelector('.button-container');
+            const containerRect = container.getBoundingClientRect();
+            const btnRect = noBtn.getBoundingClientRect();
+
+            // Calculate random position within viewport
+            const maxX = window.innerWidth - btnRect.width - 40;
+            const maxY = window.innerHeight - btnRect.height - 40;
+
+            const randomX = Math.random() * maxX + 20;
+            const randomY = Math.random() * maxY + 20;
+
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = randomX + 'px';
+            noBtn.style.top = randomY + 'px';
+            noBtn.style.transition = 'all 0.3s ease';
+        }
+
+        // Create falling hearts background
+        function createFallingHearts() {
+            const heartEmojis = ['💗', '💖', '💕', '💓', '💝', '❤️'];
+
+            setInterval(() => {
+                const heart = document.createElement('div');
+                heart.classList.add('falling-heart');
+                heart.textContent = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                heart.style.fontSize = (Math.random() * 15 + 15) + 'px';
+
+                heartsBackground.appendChild(heart);
+
+                // Remove heart after animation
+                setTimeout(() => {
+                    heart.remove();
+                }, 6000);
+            }, 500);
+        }
+
+        // Create celebration hearts effect
+        function createCelebrationHearts() {
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.textContent = '💗';
+                    heart.style.position = 'fixed';
+                    heart.style.left = Math.random() * 100 + '%';
+                    heart.style.top = '-50px';
+                    heart.style.fontSize = (Math.random() * 30 + 20) + 'px';
+                    heart.style.animation = `fall ${Math.random() * 2 + 2}s linear`;
+                    heart.style.zIndex = '100';
+
+                    document.body.appendChild(heart);
+
+                    setTimeout(() => {
+                        heart.remove();
+                    }, 4000);
+                }, i * 100);
+            }
+        }
+
+        // Add shake animation to CSS dynamically
+        const style = document.createElement('style');
+        style.textContent = `
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-10px); }
+        75% { transform: translateX(10px); }
+    }
+`;
+        document.head.appendChild(style);
+
+        // Audio controls - Allow user interaction to play
+        document.body.addEventListener('click', () => {
+            if (audio.paused && questionScreen.classList.contains('active')) {
+                audio.play().catch(error => {
+                    console.log('Audio play failed:', error);
+                });
+            }
+        }, { once: true });
+    </script>
+</body>
+
+</html>
